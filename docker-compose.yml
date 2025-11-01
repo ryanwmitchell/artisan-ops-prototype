@@ -1,0 +1,38 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15
+    container_name: artisanops-db
+    restart: always
+    environment:
+      POSTGRES_USER: artisan
+      POSTGRES_PASSWORD: artisan
+      POSTGRES_DB: artisan_ops
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  server:
+    build: ./server
+    container_name: artisanops-server
+    restart: always
+    env_file:
+      - ./server/.env
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+    volumes:
+      - ./server:/usr/src/app
+
+  web:
+    build: ./web
+    container_name: artisanops-web
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    volumes:
+      - ./web:/usr/src/app
